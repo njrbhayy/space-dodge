@@ -41,6 +41,7 @@ def main():
 
     start_time = time.time()
     elapsed_time = 0
+    high_score = 0
 
     projectiles_add_increment = 2000
     projectiles_count = 0
@@ -84,11 +85,16 @@ def main():
             elif projectile.y >= player.y and projectile.colliderect(player):
                 projectiles.remove(projectile)
                 hit = True
+                high_score = round(elapsed_time)
                 break
 
         if hit:
             lost_text = FONT.render("You Lost!", 1, "white")
+            high_score_text = FONT.render(f"Highest Time: {high_score}s", 1, "white")
+
             WINDOW.blit(lost_text, (WIDTH/2 - lost_text.get_width()/2, HEIGHT/2 - lost_text.get_height()/2))
+            WINDOW.blit(high_score_text, (WIDTH - high_score_text.get_width() - 20, 20))
+
             pygame.display.update()
             pygame.time.delay(4000)
             break
