@@ -1,9 +1,11 @@
 import pygame
 import random
 import time
+import pickle
+
 pygame.font.init()
 
-WIDTH, HEIGHT = 1000, 700
+WIDTH, HEIGHT = 1000, 700   # width and height of the window
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Space Dodge')
 
@@ -18,12 +20,14 @@ PROJECTILE_WIDTH = 10
 PROJECTILE_HEIGHT = 20
 PROJECTILE_VEL = 3
 
-
-def draw(player, elapsed_time, projectiles):
+def draw(player, elapsed_time, projectiles, high_score):
     WINDOW.blit(BG, (0, 0))
 
     time_text = FONT.render(f"Time: {round(elapsed_time)}s", 1, 'white')
-    WINDOW.blit(time_text, (20, 20))
+    high_score_text = FONT.render(f"Highest Time: {high_score}s", 1, "white")
+
+    WINDOW.blit(time_text, (20, 20))    
+    WINDOW.blit(high_score_text, (WIDTH - high_score_text.get_width() - 20, 20))
 
     pygame.draw.rect(WINDOW, "red", player)
 
@@ -34,14 +38,18 @@ def draw(player, elapsed_time, projectiles):
 
 def main():
     running = True
-
     player = pygame.Rect(200, HEIGHT - PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT)
     
     clock = pygame.time.Clock()
 
     start_time = time.time()
     elapsed_time = 0
-    high_score = 0
+    
+    try:
+        with open('high_score.dat', 'rb') as file:
+            high_score = pickle.load(file)
+    except:
+        high_score = 0
 
     projectiles_add_increment = 2000
     projectiles_count = 0
@@ -66,10 +74,6 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 break
-            # if event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_q:
-            #         print("Q key pressed")
-            #         break
 
         keys = pygame.key.get_pressed()
 
@@ -85,21 +89,26 @@ def main():
             elif projectile.y >= player.y and projectile.colliderect(player):
                 projectiles.remove(projectile)
                 hit = True
-                high_score = round(elapsed_time)
+                
+                if high_score < round(elapsed_time):
+                    high_score = round(elapsed_time)
+
                 break
 
         if hit:
             lost_text = FONT.render("You Lost!", 1, "white")
-            high_score_text = FONT.render(f"Highest Time: {high_score}s", 1, "white")
+            
+
+            with open('high_score.dat', 'wb') as file:
+                pickle.dump(high_score, file)
 
             WINDOW.blit(lost_text, (WIDTH/2 - lost_text.get_width()/2, HEIGHT/2 - lost_text.get_height()/2))
-            WINDOW.blit(high_score_text, (WIDTH - high_score_text.get_width() - 20, 20))
 
             pygame.display.update()
             pygame.time.delay(4000)
             break
 
-        draw(player, elapsed_time, projectiles)
+        draw(player, elapsed_time, projectiles, high_score)
 
     pygame.quit()
 
