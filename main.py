@@ -11,6 +11,7 @@ pygame.display.set_caption('Space Dodge')
 
 BG = pygame.transform.scale(pygame.image.load('bg.jpeg'), (WIDTH, HEIGHT))
 FONT = pygame.font.SysFont('Consolas', 30)
+LARGE_FONT = pygame.font.SysFont('Consolas', 50)
 
 PLAYER_WIDTH = 40
 PLAYER_HEIGHT = 60
@@ -81,6 +82,10 @@ def main():
             player.x -= PLAYER_VEL
         if keys[pygame.K_RIGHT] and player.x + PLAYER_VEL + PLAYER_WIDTH <= WIDTH:
             player.x += PLAYER_VEL
+        if keys[pygame.K_UP] and player.y - PLAYER_VEL >= 0:
+            player.y -= PLAYER_VEL
+        if keys[pygame.K_DOWN] and player.y + PLAYER_VEL + PLAYER_HEIGHT <= HEIGHT:
+            player.y += PLAYER_VEL
 
         for projectile in projectiles[:]:
             projectile.y += PROJECTILE_VEL
@@ -96,7 +101,7 @@ def main():
                 break
 
         if hit:
-            lost_text = FONT.render("You Lost!", 1, "white")
+            lost_text = LARGE_FONT.render("You Lost!", 1, "white")
             
 
             with open('high_score.dat', 'wb') as file:
