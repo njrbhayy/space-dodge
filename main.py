@@ -2,14 +2,16 @@ import pygame
 import random
 import time
 import pickle
+import os
 
 pygame.font.init()
+pygame.mixer.init()
 
 WIDTH, HEIGHT = 1000, 700   # width and height of the window
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Space Dodge')
 
-BG = pygame.transform.scale(pygame.image.load('bg.jpeg'), (WIDTH, HEIGHT))
+BG = pygame.transform.scale(pygame.image.load('assets/bg.jpeg'), (WIDTH, HEIGHT))
 FONT = pygame.font.SysFont('Consolas', 30)
 LARGE_FONT = pygame.font.SysFont('Consolas', 50)
 
@@ -20,6 +22,9 @@ PLAYER_VEL = 5
 PROJECTILE_WIDTH = 10
 PROJECTILE_HEIGHT = 20
 PROJECTILE_VEL = 3
+
+BLASTER_SOUND = pygame.mixer.Sound('assets/blaster.mp3')
+WANDERING_SOUND = pygame.mixer.music.load('assets/wandering.mp3')
 
 def draw(player, elapsed_time, projectiles, high_score):
     WINDOW.blit(BG, (0, 0))
@@ -58,9 +63,13 @@ def main():
     projectiles = []
     hit = False
 
+    pygame.mixer.music.play()
+
     while running:
         projectiles_count += clock.tick(60)
         elapsed_time = time.time() - start_time
+
+        # pygame.mixer.music.set_volume(0.3)
 
         if projectiles_count > projectiles_add_increment:
             for _ in range(3):
@@ -97,6 +106,9 @@ def main():
                 
                 if high_score < round(elapsed_time):
                     high_score = round(elapsed_time)
+
+                BLASTER_SOUND.set_volume(0.25)
+                BLASTER_SOUND.play()
 
                 break
 
